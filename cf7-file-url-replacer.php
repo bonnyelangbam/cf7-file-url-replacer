@@ -18,7 +18,7 @@
 
 // If this file is called directly, abort.
 if (!defined('WPINC')) {
-	die;
+    die;
 }
 
 /**
@@ -44,39 +44,28 @@ define('CF7_FILE_URL_REPLACER_URL', plugin_dir_url(__FILE__));
 /**
  * Check if Contact Form 7 is active
  */
-function cf7_fur_check_cf7_active()
-{
-	if (!is_plugin_active('contact-form-7/wp-contact-form-7.php') && !function_exists('wpcf7')) {
-		add_action('admin_notices', 'cf7_fur_cf7_missing_notice');
-		deactivate_plugins(CF7_FILE_URL_REPLACER_BASENAME);
-		if (isset($_GET['activate'])) {
-			unset($_GET['activate']);
-		}
-	}
+function cf7_fur_check_cf7_active() {
+    if (!is_plugin_active('contact-form-7/wp-contact-form-7.php') && !function_exists('wpcf7')) {
+        add_action('admin_notices', 'cf7_fur_cf7_missing_notice');
+        deactivate_plugins(CF7_FILE_URL_REPLACER_BASENAME);
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This is checking activation status, not processing form data
+        if (isset($_GET['activate'])) {
+            unset($_GET['activate']);
+        }
+    }
 }
 add_action('admin_init', 'cf7_fur_check_cf7_active');
 
 /**
  * Admin notice if Contact Form 7 is not active
  */
-function cf7_fur_cf7_missing_notice()
-{
-	?>
-	<div class="notice notice-error">
-		<p><?php esc_html_e('CF7 File URL Replacer requires Contact Form 7 to be installed and activated.', 'cf7-file-url-replacer'); ?>
-		</p>
-	</div>
-	<?php
+function cf7_fur_cf7_missing_notice() {
+    ?>
+    <div class="notice notice-error">
+        <p><?php esc_html_e('CF7 File URL Replacer requires Contact Form 7 to be installed and activated.', 'cf7-file-url-replacer'); ?></p>
+    </div>
+    <?php
 }
-
-/**
- * Load plugin textdomain for translations.
- */
-function cf7_fur_load_textdomain()
-{
-	load_plugin_textdomain('cf7-file-url-replacer', false, dirname(CF7_FILE_URL_REPLACER_BASENAME) . '/languages');
-}
-add_action('plugins_loaded', 'cf7_fur_load_textdomain');
 
 /**
  * Include the main plugin class.
@@ -86,45 +75,42 @@ require_once CF7_FILE_URL_REPLACER_PATH . 'includes/class-cf7-file-url-replacer.
 /**
  * Initialize the plugin.
  */
-function cf7_fur_init()
-{
-	$plugin = new CF7_File_URL_Replacer();
-	$plugin->init();
+function cf7_fur_init() {
+    $plugin = new CF7_File_URL_Replacer();
+    $plugin->init();
 }
 add_action('plugins_loaded', 'cf7_fur_init');
 
 /**
  * Activation hook.
  */
-function cf7_fur_activate()
-{
-	// Check minimum PHP version
-	if (version_compare(PHP_VERSION, '7.4', '<')) {
-		deactivate_plugins(CF7_FILE_URL_REPLACER_BASENAME);
-		wp_die(
-			esc_html__('CF7 File URL Replacer requires PHP 7.4 or higher.', 'cf7-file-url-replacer'),
-			esc_html__('Plugin Activation Error', 'cf7-file-url-replacer'),
-			array('back_link' => true)
-		);
-	}
-
-	// Check if Contact Form 7 is active
-	if (!is_plugin_active('contact-form-7/wp-contact-form-7.php') && !function_exists('wpcf7')) {
-		deactivate_plugins(CF7_FILE_URL_REPLACER_BASENAME);
-		wp_die(
-			esc_html__('CF7 File URL Replacer requires Contact Form 7 to be installed and activated.', 'cf7-file-url-replacer'),
-			esc_html__('Plugin Activation Error', 'cf7-file-url-replacer'),
-			array('back_link' => true)
-		);
-	}
+function cf7_fur_activate() {
+    // Check minimum PHP version
+    if (version_compare(PHP_VERSION, '7.4', '<')) {
+        deactivate_plugins(CF7_FILE_URL_REPLACER_BASENAME);
+        wp_die(
+            esc_html__('CF7 File URL Replacer requires PHP 7.4 or higher.', 'cf7-file-url-replacer'),
+            esc_html__('Plugin Activation Error', 'cf7-file-url-replacer'),
+            array('back_link' => true)
+        );
+    }
+    
+    // Check if Contact Form 7 is active
+    if (!is_plugin_active('contact-form-7/wp-contact-form-7.php') && !function_exists('wpcf7')) {
+        deactivate_plugins(CF7_FILE_URL_REPLACER_BASENAME);
+        wp_die(
+            esc_html__('CF7 File URL Replacer requires Contact Form 7 to be installed and activated.', 'cf7-file-url-replacer'),
+            esc_html__('Plugin Activation Error', 'cf7-file-url-replacer'),
+            array('back_link' => true)
+        );
+    }
 }
 register_activation_hook(__FILE__, 'cf7_fur_activate');
 
 /**
  * Deactivation hook.
  */
-function cf7_fur_deactivate()
-{
-	// Cleanup if needed
+function cf7_fur_deactivate() {
+    // Cleanup if needed
 }
 register_deactivation_hook(__FILE__, 'cf7_fur_deactivate');
